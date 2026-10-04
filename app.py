@@ -54,6 +54,7 @@ def login():
 
         if user:
             session['user_id'] = user.id
+            session['user'] = user.email
             return redirect('/dashboard')
         else:
             return "Invalid email or password."
@@ -63,7 +64,7 @@ def login():
 #DASHBOARD
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    if 'user' not in session:
+    if 'user_id' not in session:
         return redirect('/login')
 
     result = None
@@ -135,16 +136,16 @@ def history():
     pasred_reports = []
     for r in reports:
         try:
-            pasred_reports = json.loads(r.result)
+            result_data = json.loads(r.result)
         except:
-            parsed_reports = []
+            result_data = {}
 
         pasred_reports.append({
             "resume":r.resume_text,
-            "result": pasred_reports
+            "result": result_data
         })    
         
-    return render_template("history.html", report=pasred_reports)
+    return render_template("history.html", reports=pasred_reports)
 
 #Logout
 @app.route('/logout')
