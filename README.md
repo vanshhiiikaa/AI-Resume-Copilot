@@ -1269,10 +1269,3 @@ and how to prepare for interviews."
  Built with Python, Flask, OpenAI, SQLAlchemy, PyMySQL and TiDB Cloud.
 
 ```
-
-### ⚠️ Ek correction
-
-README mein maine `ca.pem` ko project structure mein dikhaya hai **sirf example ke liye**. Actual project mein CA certificate ko GitHub par upload **mat karna**. `.gitignore` mein `*.pem` rakhna.
-
-Aur jo **TiDB password tumne chat mein expose kiya tha, usko definitely regenerate/reset kar lena** before continuing with the database connection.
-```
