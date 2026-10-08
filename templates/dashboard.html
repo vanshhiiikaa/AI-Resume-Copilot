@@ -1,54 +1,409 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h2>Welcome, {{user}}</h2>
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-<div class="card">
-    <h3>Resume Analyser</h3>
+    .dashboard-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
 
-    <form method="POST" enctype="multipart/form-data">
-        <textarea name="resume" placeholder="Paste your resume text here(optional)" rows="10"></textarea>
-        <p>OR upload file:</p>
-        <input type="file" name="file">
-        input name="role" placeholder="What do you want to become? (e. Backend Engineer)">
-        <button type="submit">Analyze Resume</button>
-    </form>
-</div>
+    .welcome {
+        margin-bottom: 25px;
+    }
 
-{% if result %}
-<div class="red">
-    {% if result.error %}
-    <p style="color: red;">Error: {{ result.error }}</p>
+    .welcome h2 {
+        margin: 0;
+        font-size: 30px;
+        color: #111827;
+    }
+
+    .welcome p {
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    .analyser-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eef0f4;
+    }
+
+    .analyser-header {
+        margin-bottom: 25px;
+    }
+
+    .analyser-header h3 {
+        margin: 0;
+        font-size: 24px;
+        color: #111827;
+    }
+
+    .analyser-header p {
+        color: #6b7280;
+        margin-top: 7px;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 9px;
+        font-size: 15px;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 220px;
+        resize: vertical;
+        padding: 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        font-size: 15px;
+        font-family: inherit;
+        color: #111827;
+        background: #fafafa;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    textarea:focus {
+        background: white;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    textarea::placeholder {
+        color: #9ca3af;
+    }
+
+    .goal-input {
+        width: 100%;
+        height: 52px;
+        padding: 0 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: inherit;
+        background: #fafafa;
+        color: #111827;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .goal-input:focus {
+        background: white;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    .goal-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .upload-box {
+        border: 2px dashed #c7d2fe;
+        background: #f5f7ff;
+        border-radius: 14px;
+        padding: 22px;
+        text-align: center;
+        margin-bottom: 22px;
+        transition: 0.2s ease;
+    }
+
+    .upload-box:hover {
+        border-color: #6366f1;
+        background: #eef2ff;
+    }
+
+    .upload-icon {
+        font-size: 30px;
+        margin-bottom: 8px;
+    }
+
+    .upload-box p {
+        margin: 5px 0;
+        color: #4b5563;
+        font-weight: 500;
+    }
+
+    .upload-box small {
+        color: #9ca3af;
+    }
+
+    .file-input {
+        margin-top: 14px;
+        width: 100%;
+    }
+
+    .analyze-btn {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 12px;
+    background: #6b7280;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 6px 16px rgba(107, 114, 128, 0.25);
+}
+
+.analyze-btn:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(75, 85, 99, 0.3);
+}
+
+    .results {
+        margin-top: 30px;
+    }
+
+    .results-title {
+        font-size: 24px;
+        color: #111827;
+        margin-bottom: 18px;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 18px;
+        border: 1px solid #eef0f4;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+    }
+
+    .result-card h3 {
+        margin-top: 0;
+        color: #4f46e5;
+        font-size: 19px;
+    }
+
+    .result-card ul {
+        padding-left: 22px;
+        margin-bottom: 0;
+    }
+
+    .result-card li {
+        margin-bottom: 8px;
+        color: #374151;
+        line-height: 1.5;
+    }
+
+    .error-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+        .dashboard-container {
+            margin: 20px auto;
+            padding: 0 12px;
+        }
+
+        .analyser-card {
+            padding: 20px;
+        }
+
+        .welcome h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+
+<div class="dashboard-container">
+
+    <!-- Welcome -->
+    <div class="welcome">
+        <h2>Welcome, {{ user }} 👋</h2>
+        <p>Analyze your resume and discover what you need to reach your career goal.</p>
+    </div>
+
+
+    <!-- Resume Analyzer -->
+    <div class="analyser-card">
+
+        <div class="analyser-header">
+            <h3>🚀 Resume Analyser</h3>
+            <p>Upload your resume or paste your resume text below.</p>
+        </div>
+
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <!-- Resume Text -->
+            <div class="form-group">
+                <label for="resume">Resume</label>
+
+                <textarea
+                    id="resume"
+                    name="resume"
+                    placeholder="Paste your resume text here (optional)..."
+                ></textarea>
+            </div>
+
+
+            <!-- File Upload -->
+            <div class="upload-box">
+
+                <div class="upload-icon">📄</div>
+
+                <p>Upload your resume</p>
+
+                <small>
+                    Supported formats: PDF or DOCX
+                </small>
+
+                <br>
+
+                <input
+                    class="file-input"
+                    type="file"
+                    name="file"
+                    accept=".pdf,.docx"
+                >
+
+            </div>
+
+
+            <!-- Career Goal -->
+            <div class="form-group">
+
+                <label for="goal">
+                    🎯 What do you want to become?
+                </label>
+
+                <input
+                    type="text"
+                    id="goal"
+                    name="goal"
+                    class="goal-input"
+                    placeholder="e.g. Backend Engineer, Data Scientist, Full Stack Developer"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Submit -->
+            <button
+                type="submit"
+                class="analyze-btn"
+            >
+                ✨ Analyze My Resume
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- Results -->
+    {% if result %}
+
+    <div class="results">
+
+        <h2 class="results-title">
+            📊 Your Resume Analysis
+        </h2>
+
+
+        <!-- Error -->
+        {% if result.error %}
+
+        <div class="error-box">
+            <strong>Something went wrong:</strong>
+            {{ result.error }}
+        </div>
+
+        {% endif %}
+
+
+        <!-- Skills -->
+        <div class="result-card">
+
+            <h3>💪 Your Skills</h3>
+
+            <ul>
+                {% for s in result.get("skills", []) %}
+                    <li>{{ s }}</li>
+                {% else %}
+                    <li>No skills found.</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+
+        <!-- Missing Skills -->
+        <div class="result-card">
+
+            <h3>📚 Skills You Need</h3>
+
+            <ul>
+                {% for s in result.get("missing_skills", []) %}
+                    <li>{{ s }}</li>
+                {% else %}
+                    <li>No missing skills found.</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+
+        <!-- Roadmap -->
+        <div class="result-card">
+
+            <h3>🗺️ Your Career Roadmap</h3>
+
+            <ul>
+                {% for s in result.get("roadmap", []) %}
+                    <li>{{ s }}</li>
+                {% else %}
+                    <li>No roadmap available.</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+
+        <!-- Interview Questions -->
+        <div class="result-card">
+
+            <h3>🎤 Interview Questions</h3>
+
+            <ul>
+                {% for s in result.get("interview_questions", []) %}
+                    <li>{{ s }}</li>
+                {% else %}
+                    <li>No interview questions available.</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+    </div>
+
     {% endif %}
 
-    <h3>Skills</h3>
-    <ul>
-        {% for s in result.get("skills", []) %}
-        <li>{{ s }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Missing Skills</h3>
-    <ul>
-        {% for s in result.get("missing_skills", []) %}
-        <li>{{ s }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Roadmap</h3>
-    <ul>
-        {% for s in result.get("roadmap", []) %}
-        <li>{{ s }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Interview Questions</h3>
-    <ul>
-        {% for s in result.get("interview_questions", []) %}
-        <li>{{ s }}</li>
-        {% endfor %}
-    </ul>
-
 </div>
-{% endif %}
+
 {% endblock %}
